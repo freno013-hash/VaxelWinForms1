@@ -1,0 +1,42 @@
+name: Build & Test (Windows)
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+
+      - name: Restore
+        run: dotnet restore VaxelWinForms.sln
+
+      - name: Build
+        run: dotnet build VaxelWinForms.sln -c Release
+
+      - name: Test
+        run: dotnet test VaxelWinForms.sln -c Release --no-build
+
+      - name: Publish WinForms app
+        run: dotnet publish VaxelApp/VaxelApp.csproj -c Release -r win-x64 -p:PublishSingleFile=true -p:SelfContained=false -o publish
+
+      - name: Zip project for Canvas
+        run: |
+          powershell Compress-Archive -Path VaxelApp,VaxelApp.Tests,VaxelWinForms.sln -DestinationPath VaxelWinForms_Project.zip -Force
+
+      - name: Upload artifacts (zip + published exe)
+        uses: actions/upload-artifact@v4
+        with:
+          name: deliverables
+          path: |
+            VaxelWinForms_Project.zip
+            publish/**
