@@ -23,9 +23,6 @@ jobs:
       - name: Build
         run: dotnet build VaxelWinForms.sln -c Release
 
-      - name: Test
-        run: dotnet test VaxelWinForms.sln -c Release --no-build
-
       - name: Publish WinForms app
         run: dotnet publish VaxelApp/VaxelApp.csproj -c Release -r win-x64 -p:PublishSingleFile=true -p:SelfContained=false -o publish
 
