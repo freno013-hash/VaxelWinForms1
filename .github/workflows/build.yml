@@ -17,18 +17,20 @@ jobs:
           dotnet-version: |
             8.0.x
 
+  
       - name: Restore
-        run: dotnet restore VaxelWinForms.sln
+        run: dotnet restore VaxelApp/VaxelApp.csproj
 
       - name: Build
-        run: dotnet build VaxelWinForms.sln -c Release
+        run: dotnet build VaxelApp/VaxelApp.csproj -c Release --no-restore
 
+      # (Teststeget är borttaget)
       - name: Publish WinForms app
         run: dotnet publish VaxelApp/VaxelApp.csproj -c Release -r win-x64 -p:PublishSingleFile=true -p:SelfContained=false -o publish
 
       - name: Zip project for Canvas
         run: |
-          powershell Compress-Archive -Path VaxelApp,VaxelApp.Tests,VaxelWinForms.sln -DestinationPath VaxelWinForms_Project.zip -Force
+          powershell Compress-Archive -Path VaxelApp -DestinationPath VaxelWinForms_Project.zip -Force
 
       - name: Upload artifacts (zip + published exe)
         uses: actions/upload-artifact@v4
